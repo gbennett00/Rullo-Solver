@@ -26,6 +26,7 @@ public class PuzzleValues{
 
     public static boolean[][] confirmed = new boolean[5][5];
 
+   
     public int columnCurrentSum(int column){
         int currentSum = 0;
         for(int i = 0; i < 5; i++){
@@ -52,6 +53,11 @@ public class PuzzleValues{
 
     public boolean rowIsFinished(int row){
         return rows[row] == rowCurrentSum(row);
+    }
+
+    public void deactivateNumber(int row, int column){
+        contributor[row][column] = false;
+        confirmed[row][column] = true;
     }
 
 }
