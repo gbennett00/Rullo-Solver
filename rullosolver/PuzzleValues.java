@@ -44,6 +44,23 @@ public class PuzzleValues{
         return currentSum;
     }
 
+    public int currentConfirmedSum(int section, boolean column){
+        int confirmedSum = 0;
+        for(int i = 0; i < 5; i++){
+            if(column){ 
+                if(confirmedTrue[i][section]){
+                    confirmedSum += value[i][section];
+                }
+            }else{
+                if(confirmedTrue[section][i]){
+                    confirmedSum += value[i][section];
+                }
+            }
+        }
+        return confirmedSum;
+        
+    }
+
     public boolean isFinished(int section, boolean column){
         if(column){
             return columns[section] == currentSum(section, column);
@@ -68,12 +85,21 @@ public class PuzzleValues{
         }
     }
 
+    public int getLowerDifference(int section, boolean column){
+        if(column){
+            return columns[section] - currentConfirmedSum(section, column);
+        }else{
+            return rows[section] - currentConfirmedSum(section, column);
+        }
+    }
+
     public void deleteGreaterValues(){
         
         for(int r = 0; r < 5; r++){
             for(int c = 0; c < 5; c++){
                 if(value[r][c] > rows[r] || value[r][c] > columns[c]){
                     deactivateNumber(r, c);
+                    System.out.println("deactivated first at " + r + "," + c);
                 }
             }
         }
@@ -84,28 +110,42 @@ public class PuzzleValues{
         for(int c = 0; c < 5; c++){
             currentDiff = getTopDifference(c, true); //currentSum(c, true) - columns[c];
             for(int r = 0; r < 5; r++){
-                if(value[r][c] > currentDiff || contributor[r][c]){
+                if(value[r][c] > currentDiff && contributor[r][c]){
                     confirmedTrue[r][c] = true;
+                    System.out.println("confirmed by column at " + r + "," + c);
                 }
             }
         }
         for(int r = 0; r < 5; r++){
             currentDiff = getTopDifference(r, false);
             for(int c = 0; c < 5; c++){
-                if(value[r][c] > currentDiff){
+                if(value[r][c] > currentDiff && contributor[r][c]){
                     confirmedTrue[r][c] = true;
+                    System.out.println("confirmed by row at " + r + "," + c);
                 }
             }
         }
     }
 
-    /*public void deleteGreaterThanLDiff(){
+    public void deleteGTLowerDiff(){
         int currentDiff;
         for(int c = 0; c < 5; c++){
-            currentDiff = columns[c];
+            currentDiff = getLowerDifference(c, true);
+            for(int r = 0; r < 5; r++){
+                if(value[r][c] > currentDiff && !confirmedTrue[r][c]){
+                    deactivateNumber(r, c);
+                    System.out.println("deactivated by column at " + r + "," + c);
+                }
+            }
         }
-    }*/
-
-
-
+        for(int r = 0; r < 5; r++){
+            currentDiff = getLowerDifference(r, false);
+            for(int c = 0; c < 5; c++){
+                if(value[r][c] > currentDiff && !confirmedTrue[r][c]){
+                    deactivateNumber(r, c);
+                    System.out.println("deactivated by row at " + r + "," + c);
+                }
+            }
+        }
+    }
 }
