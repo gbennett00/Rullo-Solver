@@ -5,11 +5,19 @@ public class RulloSolver{
     //public static Algorithms algorithms = new Algorithms();
     public static void main(String args[ ]){
         puzzleValues.deleteGreaterValues();
-        for(int x = 0; x < 5; x++){ 
+        while(!PuzzleValues.puzzleFinished){ 
+            PuzzleValues.changeMade = false;
             puzzleValues.confirmGreaterThanTDiff();
             puzzleValues.deleteGTLowerDiff();
+            puzzleValues.checkForSolve();
+            if(!PuzzleValues.changeMade){
+                PuzzleValues.puzzleFinished = true;
+                System.out.println("Forgive me father, for I have failed");
+            }
         }
         outputValues();
+       
+        
         
     }
 

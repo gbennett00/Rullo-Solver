@@ -6,17 +6,19 @@ public class PuzzleValues{
     }
 
     public static final int[][] value = {
-        {4, 3, 5, 9, 7},
-        {5, 1, 9, 4, 2},
-        {3, 8, 7, 5, 4}, 
-        {6, 2, 3, 5, 4},
-        {4, 4, 4, 2, 5}
+        {2, 1, 9, 5, 3},
+        {9, 4, 8, 2, 1},
+        {9, 5, 7, 7, 8}, 
+        {6, 9, 7, 3, 2},
+        {1, 9, 6, 6, 5}
     };
 
-    public static final int[] columns = {13, 17, 12, 20, 6};
+    public static final int[] columns = {18, 23, 14, 8, 13};
     public static boolean[] columnFinished = new boolean[5];
-    public static final int[] rows = {21, 11, 20, 6, 10};
+    public static final int[] rows = {6, 6, 24, 24, 16};
     public static boolean[] rowFinished = new boolean[5];
+    public static boolean puzzleFinished = false;
+    public static boolean changeMade = false;
     private boolean systemOut = false;
     
     public static boolean[][] contributor = {
@@ -28,6 +30,15 @@ public class PuzzleValues{
     };
 
     public static boolean[][] confirmedTrue = new boolean[5][5];
+
+    public void checkForSolve(){
+        for(int x = 0; x < 5; x++){
+            if(!rowFinished[x] || !columnFinished[x]){
+                return;
+            }
+        }
+        puzzleFinished = true;
+    } 
 
     public int currentSum(int section, boolean column){
         int currentSum = 0;
@@ -101,12 +112,14 @@ public class PuzzleValues{
             for(int r = 0; r < 5; r++){
                 if(!confirmedTrue[r][section]){
                     deactivateNumber(r, section);
+                    changeMade = true;
                 }
             }
         }else{
             for(int c = 0; c < 5; c++){
                 if(!confirmedTrue[section][c]){
                     deactivateNumber(section, c);
+                    changeMade = true;
                 }
             }
         }
@@ -118,6 +131,7 @@ public class PuzzleValues{
             for(int c = 0; c < 5; c++){
                 if(value[r][c] > rows[r] || value[r][c] > columns[c]){
                     deactivateNumber(r, c);
+                    changeMade = true;
                     if(systemOut)System.out.println("deactivated first at " + r + "," + c);
                 }
             }
@@ -131,6 +145,7 @@ public class PuzzleValues{
             for(int r = 0; r < 5; r++){
                 if(value[r][c] > currentDiff && contributor[r][c] && !confirmedTrue[r][c]){
                     confirmedTrue[r][c] = true;
+                    changeMade = true;
                     if(systemOut)System.out.println("confirmed by column at " + r + "," + c);
                     if(currentConfirmedSum(c, true) == columns[c]){
                         deleteUnconfirmedValues(c, true);
@@ -144,6 +159,7 @@ public class PuzzleValues{
             for(int c = 0; c < 5; c++){
                 if(value[r][c] > currentDiff && contributor[r][c] && !confirmedTrue[r][c]){
                     confirmedTrue[r][c] = true;
+                    changeMade = true;
                     if(systemOut)System.out.println("confirmed by row at " + r + "," + c);
                     if(currentConfirmedSum(r, false) == rows[r]){
                         deleteUnconfirmedValues(r, false);
@@ -161,6 +177,7 @@ public class PuzzleValues{
             for(int r = 0; r < 5; r++){
                 if(value[r][c] > currentDiff && !confirmedTrue[r][c]){
                     deactivateNumber(r, c);
+                    changeMade = true;
                     if(systemOut)System.out.println("deactivated by column at " + r + "," + c);
                     if(currentConfirmedSum(c, true) == columns[c]){
                         deleteUnconfirmedValues(c, true);
@@ -174,6 +191,7 @@ public class PuzzleValues{
             for(int c = 0; c < 5; c++){
                 if(value[r][c] > currentDiff && !confirmedTrue[r][c]){
                     deactivateNumber(r, c);
+                    changeMade = true;
                     if(systemOut)System.out.println("deactivated by row at " + r + "," + c);
                     if(currentConfirmedSum(r, false) == rows[r]){
                         deleteUnconfirmedValues(r, false);
