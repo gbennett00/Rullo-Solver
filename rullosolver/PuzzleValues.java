@@ -6,33 +6,37 @@ public class PuzzleValues{
     }
 
     public static final int[][] value = {
-        {2, 1, 9, 5, 3},
-        {9, 4, 8, 2, 1},
-        {9, 5, 7, 7, 8}, 
-        {6, 9, 7, 3, 2},
-        {1, 9, 6, 6, 5}
+        {7, 2, 3, 7, 4, 9},
+        {2, 2, 1, 4, 9, 4},
+        {1, 5, 9, 5, 1, 8}, 
+        {1, 7, 2, 1, 5, 8},
+        {7, 5, 5, 6, 3, 9},
+        {3, 6, 2, 1, 7, 3}
     };
 
-    public static final int[] columns = {18, 23, 14, 8, 13};
-    public static boolean[] columnFinished = new boolean[5];
-    public static final int[] rows = {6, 6, 24, 24, 16};
-    public static boolean[] rowFinished = new boolean[5];
+    public static final int gridSize = 6;
+
+    public static final int[] columns = {17, 14, 6, 23, 26, 20};
+    public static boolean[] columnFinished = new boolean[gridSize];
+    public static final int[] rows = {23, 18, 19, 9, 27, 10};
+    public static boolean[] rowFinished = new boolean[gridSize];
     public static boolean puzzleFinished = false;
     public static boolean changeMade = false;
     private boolean systemOut = false;
     
     public static boolean[][] contributor = {
-        {true, true, true, true, true},
-        {true, true, true, true, true},
-        {true, true, true, true, true},
-        {true, true, true, true, true},
-        {true, true, true, true, true},
+        {true, true, true, true, true, true},
+        {true, true, true, true, true, true},
+        {true, true, true, true, true, true},
+        {true, true, true, true, true, true},
+        {true, true, true, true, true, true},
+        {true, true, true, true, true, true}
     };
 
-    public static boolean[][] confirmedTrue = new boolean[5][5];
+    public static boolean[][] confirmedTrue = new boolean[gridSize][gridSize];
 
     public void checkForSolve(){
-        for(int x = 0; x < 5; x++){
+        for(int x = 0; x < gridSize; x++){
             if(!rowFinished[x] || !columnFinished[x]){
                 return;
             }
@@ -43,13 +47,13 @@ public class PuzzleValues{
     public int currentSum(int section, boolean column){
         int currentSum = 0;
         if(column){
-            for(int i = 0; i < 5; i++){
+            for(int i = 0; i < gridSize; i++){
                 if(contributor[i][section]){
                     currentSum += value[i][section];
                 }
             }
         }else{
-            for(int i = 0; i < 5; i ++){
+            for(int i = 0; i < gridSize; i ++){
                 if(contributor[section][i]){
                     currentSum += value[section][i];
                 }
@@ -60,7 +64,7 @@ public class PuzzleValues{
 
     public int currentConfirmedSum(int section, boolean column){
         int confirmedSum = 0;
-        for(int i = 0; i < 5; i++){
+        for(int i = 0; i < gridSize; i++){
             if(column){ 
                 if(confirmedTrue[i][section]){
                     confirmedSum += value[i][section];
@@ -87,10 +91,6 @@ public class PuzzleValues{
         contributor[row][column] = false;
     }
 
-    public void confirmNumber(int row, int column){
-        confirmedTrue[row][column] = true;
-    }
-
     public int getTopDifference(int section, boolean column){
         if(column){
             return (currentSum(section, column) - columns[section]);
@@ -109,14 +109,14 @@ public class PuzzleValues{
 
     public void deleteUnconfirmedValues(int section, boolean column){
         if(column){
-            for(int r = 0; r < 5; r++){
+            for(int r = 0; r < gridSize; r++){
                 if(!confirmedTrue[r][section]){
                     deactivateNumber(r, section);
                     changeMade = true;
                 }
             }
         }else{
-            for(int c = 0; c < 5; c++){
+            for(int c = 0; c < gridSize; c++){
                 if(!confirmedTrue[section][c]){
                     deactivateNumber(section, c);
                     changeMade = true;
@@ -127,8 +127,8 @@ public class PuzzleValues{
 
     public void deleteGreaterValues(){
         
-        for(int r = 0; r < 5; r++){
-            for(int c = 0; c < 5; c++){
+        for(int r = 0; r < gridSize; r++){
+            for(int c = 0; c < gridSize; c++){
                 if(value[r][c] > rows[r] || value[r][c] > columns[c]){
                     deactivateNumber(r, c);
                     changeMade = true;
@@ -140,23 +140,25 @@ public class PuzzleValues{
 
     public void confirmGreaterThanTDiff(){
         int currentDiff;
-        for(int c = 0; c < 5; c++){
-            currentDiff = getTopDifference(c, true); //currentSum(c, true) - columns[c];
-            for(int r = 0; r < 5; r++){
-                if(value[r][c] > currentDiff && contributor[r][c] && !confirmedTrue[r][c]){
-                    confirmedTrue[r][c] = true;
-                    changeMade = true;
-                    if(systemOut)System.out.println("confirmed by column at " + r + "," + c);
-                    if(currentConfirmedSum(c, true) == columns[c]){
-                        deleteUnconfirmedValues(c, true);
-                        columnFinished[c] = true;
+        for(int c = 0; c < gridSize; c++){
+            if(!columnFinished[c]){
+                currentDiff = getTopDifference(c, true); //currentSum(c, true) - columns[c];
+                for(int r = 0; r < gridSize; r++){
+                    if(value[r][c] > currentDiff && contributor[r][c] && !confirmedTrue[r][c]){
+                        confirmedTrue[r][c] = true;
+                        changeMade = true;
+                        if(systemOut)System.out.println("confirmed by column at " + r + "," + c);
+                        if(currentConfirmedSum(c, true) == columns[c]){
+                            deleteUnconfirmedValues(c, true);
+                            columnFinished[c] = true;
+                        }
                     }
                 }
             }
         }
-        for(int r = 0; r < 5; r++){
+        for(int r = 0; r < gridSize; r++){
             currentDiff = getTopDifference(r, false);
-            for(int c = 0; c < 5; c++){
+            for(int c = 0; c < gridSize; c++){
                 if(value[r][c] > currentDiff && contributor[r][c] && !confirmedTrue[r][c]){
                     confirmedTrue[r][c] = true;
                     changeMade = true;
@@ -172,9 +174,9 @@ public class PuzzleValues{
 
     public void deleteGTLowerDiff(){
         int currentDiff;
-        for(int c = 0; c < 5; c++){
+        for(int c = 0; c < gridSize; c++){
             currentDiff = getLowerDifference(c, true);
-            for(int r = 0; r < 5; r++){
+            for(int r = 0; r < gridSize; r++){
                 if(value[r][c] > currentDiff && !confirmedTrue[r][c]){
                     deactivateNumber(r, c);
                     changeMade = true;
@@ -186,9 +188,9 @@ public class PuzzleValues{
                 }
             }
         }
-        for(int r = 0; r < 5; r++){
+        for(int r = 0; r < gridSize; r++){
             currentDiff = getLowerDifference(r, false);
-            for(int c = 0; c < 5; c++){
+            for(int c = 0; c < gridSize; c++){
                 if(value[r][c] > currentDiff && !confirmedTrue[r][c]){
                     deactivateNumber(r, c);
                     changeMade = true;

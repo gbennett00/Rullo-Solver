@@ -22,8 +22,8 @@ public class RulloSolver{
     }
 
     private static void outputValues(){
-        for(int c = 0; c < 5; c++){
-            for(int r = 0; r < 5; r++){
+        for(int c = 0; c < PuzzleValues.gridSize; c++){
+            for(int r = 0; r < PuzzleValues.gridSize; r++){
                 System.out.println("At point " + r + "," + c + ": " + PuzzleValues.confirmedTrue[r][c]);
             }
         }
