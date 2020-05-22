@@ -6,43 +6,47 @@ public class PuzzleValues{
     }
 
     public static final int[][] value = {
-        {7, 2, 3, 7, 4, 9},
-        {2, 2, 1, 4, 9, 4},
-        {1, 5, 9, 5, 1, 8}, 
-        {1, 7, 2, 1, 5, 8},
-        {7, 5, 5, 6, 3, 9},
-        {3, 6, 2, 1, 7, 3}
+        {4, 8, 8, 7, 9, 7},
+        {9, 9, 4, 5, 6, 1},
+        {6, 6, 7, 1, 9, 8}, 
+        {8, 6, 6, 3, 7, 2},
+        {6, 2, 7, 6, 5, 5},
+        {8, 6, 3, 5, 9, 5}
     };
 
     public static final int gridSize = 6;
 
-    public static final int[] columns = {17, 14, 6, 23, 26, 20};
+    public static final int[] columns = {21, 29, 28, 23, 27, 20};
     public static boolean[] columnFinished = new boolean[gridSize];
-    public static final int[] rows = {23, 18, 19, 9, 27, 10};
+    public static final int[] rows = {19, 29, 21, 29, 25, 25};
     public static boolean[] rowFinished = new boolean[gridSize];
     public static boolean puzzleFinished = false;
     public static boolean changeMade = false;
-    private boolean systemOut = false;
+    protected static boolean systemOut = false;
     
-    public static boolean[][] contributor = {
-        {true, true, true, true, true, true},
-        {true, true, true, true, true, true},
-        {true, true, true, true, true, true},
-        {true, true, true, true, true, true},
-        {true, true, true, true, true, true},
-        {true, true, true, true, true, true}
-    };
-
-    public static boolean[][] confirmedTrue = new boolean[gridSize][gridSize];
-
-    public void checkForSolve(){
+    public static boolean[][] contributor = new boolean[gridSize][gridSize];
+    
+    public static void setContributorTrue(){
         for(int x = 0; x < gridSize; x++){
-            if(!rowFinished[x] || !columnFinished[x]){
+            for(int y = 0; y < gridSize; y++){
+                contributor[x][y] = true;
+            }
+        }
+    }
+    
+    public static boolean[][] confirmedTrue = new boolean[gridSize][gridSize];
+    
+    public void checkForSolve(){
+        for(int x = 0; x < 5; x++){
+            checkSectionSolve(x, x);
+        }
+        for(int x = 0; x < gridSize; x++){
+            if(!columnFinished[x] || !rowFinished[x]){
                 return;
             }
         }
         puzzleFinished = true;
-    } 
+    }
 
     public int currentSum(int section, boolean column){
         int currentSum = 0;
@@ -107,18 +111,33 @@ public class PuzzleValues{
         }
     }
 
+    public void checkSectionSolve(int r, int c){
+        if(currentConfirmedSum(c, true) == columns[c] && !columnFinished[c]){
+            deleteUnconfirmedValues(c, true);
+            columnFinished[c] = true;
+            if(systemOut)System.out.println("column " + c + " finished");
+        }
+        if(currentConfirmedSum(r, false) == rows[r] && !rowFinished[r]){
+            deleteUnconfirmedValues(r, false);
+            rowFinished[r] = true;
+            if(systemOut)System.out.println("row " + r + " finished");
+        }
+    }
+
     public void deleteUnconfirmedValues(int section, boolean column){
         if(column){
             for(int r = 0; r < gridSize; r++){
-                if(!confirmedTrue[r][section]){
+                if(!confirmedTrue[r][section] && contributor[r][section]){
                     deactivateNumber(r, section);
+                    if(systemOut)System.out.println("deactivated bc solved at " + r + "," + section);
                     changeMade = true;
                 }
             }
         }else{
             for(int c = 0; c < gridSize; c++){
-                if(!confirmedTrue[section][c]){
+                if(!confirmedTrue[section][c] && contributor[section][c]){
                     deactivateNumber(section, c);
+                    if(systemOut)System.out.println("deactivated bc solved at " + section + "," + c);
                     changeMade = true;
                 }
             }
@@ -127,9 +146,9 @@ public class PuzzleValues{
 
     public void deleteGreaterValues(){
         
-        for(int r = 0; r < gridSize; r++){
+        for(int r = 0; r < gridSize; r++){  //cycle through every value
             for(int c = 0; c < gridSize; c++){
-                if(value[r][c] > rows[r] || value[r][c] > columns[c]){
+                if(value[r][c] > rows[r] || value[r][c] > columns[c]){ //if given value is greater than column/ row sum
                     deactivateNumber(r, c);
                     changeMade = true;
                     if(systemOut)System.out.println("deactivated first at " + r + "," + c);
@@ -140,36 +159,33 @@ public class PuzzleValues{
 
     public void confirmGreaterThanTDiff(){
         int currentDiff;
-        for(int c = 0; c < gridSize; c++){
-            if(!columnFinished[c]){
-                currentDiff = getTopDifference(c, true); //currentSum(c, true) - columns[c];
-                for(int r = 0; r < gridSize; r++){
+        for(int c = 0; c < gridSize; c++){                      //cycle through every column
+            if(!columnFinished[c]){                             //if column isn't finished 
+                currentDiff = getTopDifference(c, true);        //set currentDiff as diff b/w current sum and target
+                for(int r = 0; r < gridSize; r++){              //cycle through every value by column
                     if(value[r][c] > currentDiff && contributor[r][c] && !confirmedTrue[r][c]){
                         confirmedTrue[r][c] = true;
                         changeMade = true;
                         if(systemOut)System.out.println("confirmed by column at " + r + "," + c);
-                        if(currentConfirmedSum(c, true) == columns[c]){
-                            deleteUnconfirmedValues(c, true);
-                            columnFinished[c] = true;
-                        }
+                        checkSectionSolve(r, c);
                     }
                 }
             }
         }
         for(int r = 0; r < gridSize; r++){
             currentDiff = getTopDifference(r, false);
-            for(int c = 0; c < gridSize; c++){
-                if(value[r][c] > currentDiff && contributor[r][c] && !confirmedTrue[r][c]){
-                    confirmedTrue[r][c] = true;
-                    changeMade = true;
-                    if(systemOut)System.out.println("confirmed by row at " + r + "," + c);
-                    if(currentConfirmedSum(r, false) == rows[r]){
-                        deleteUnconfirmedValues(r, false);
-                        rowFinished[r] = true;
+            if(!rowFinished[r]){
+                for(int c = 0; c < gridSize; c++){
+                    if(value[r][c] > currentDiff && contributor[r][c] && !confirmedTrue[r][c]){
+                        confirmedTrue[r][c] = true;
+                        changeMade = true;
+                        if(systemOut)System.out.println("confirmed by row at " + r + "," + c);
+                        checkSectionSolve(r, c);
                     }
                 }
             }
         }
+        deleteGTLowerDiff();
     }
 
     public void deleteGTLowerDiff(){
@@ -177,28 +193,22 @@ public class PuzzleValues{
         for(int c = 0; c < gridSize; c++){
             currentDiff = getLowerDifference(c, true);
             for(int r = 0; r < gridSize; r++){
-                if(value[r][c] > currentDiff && !confirmedTrue[r][c]){
+                if(value[r][c] > currentDiff && !confirmedTrue[r][c] && contributor[r][c]){
                     deactivateNumber(r, c);
                     changeMade = true;
                     if(systemOut)System.out.println("deactivated by column at " + r + "," + c);
-                    if(currentConfirmedSum(c, true) == columns[c]){
-                        deleteUnconfirmedValues(c, true);
-                        columnFinished[c] = true;
-                    }
+                    checkSectionSolve(r, c);
                 }
             }
         }
         for(int r = 0; r < gridSize; r++){
             currentDiff = getLowerDifference(r, false);
             for(int c = 0; c < gridSize; c++){
-                if(value[r][c] > currentDiff && !confirmedTrue[r][c]){
+                if(value[r][c] > currentDiff && !confirmedTrue[r][c] && contributor[r][c]){
                     deactivateNumber(r, c);
                     changeMade = true;
                     if(systemOut)System.out.println("deactivated by row at " + r + "," + c);
-                    if(currentConfirmedSum(r, false) == rows[r]){
-                        deleteUnconfirmedValues(r, false);
-                        rowFinished[r] = true;
-                    }
+                    checkSectionSolve(r, c);
                 }
             }
         }
