@@ -1,5 +1,7 @@
 package rullosolver;
 
+import rullosolver.PuzzleValues;
+
 public class RulloSolver{
     public static PuzzleValues puzzleValues = new PuzzleValues();
     public static void main(String args[ ]){
