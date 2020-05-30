@@ -3,24 +3,13 @@ package rullosolver;
 
 public class PuzzleValues{
     
-    /*public static final int[][] value1 = {
-        {7, 1, 9, 4, 1, 8, 7},
-        {5, 6, 3, 4, 2, 2, 2},
-        {9, 7, 8, 4, 5, 2, 8}, 
-        {3, 5, 1, 2, 5, 9, 5},
-        {9, 5, 4, 8, 9, 3, 5},
-        {5, 1, 1, 9, 7, 4, 2},
-        {9, 9, 6, 1, 2, 4, 2}
-    };*/
-    private static final int[][] value1 = App.value;
+    protected static final int[][] value = ImageReader.getMainValues();
 
-    String image = App.readImage("Rullo.jpg");
+    protected static final int gridSize = 6;
 
-    protected static final int gridSize = 7;
-
-    private static final int[] columns = {44, 29, 26, 19, 14, 18, 29};
+    protected static final int[] columns = ImageReader.getColumnValues();
     private static boolean[] columnFinished = new boolean[gridSize];
-    private static final int[] rows = {28, 20, 41, 21, 30, 12, 27};
+    protected static final int[] rows = ImageReader.getRowValues();
     private static boolean[] rowFinished = new boolean[gridSize];
     protected static boolean puzzleFinished = false;
     protected static boolean changeMade = false;
@@ -50,34 +39,34 @@ public class PuzzleValues{
         puzzleFinished = true;
     }
 
-    private int currentSum(int section, boolean column){
+    protected int currentSum(int section, boolean column){
         int currentSum = 0;
         if(column){
             for(int i = 0; i < gridSize; i++){
                 if(contributor[i][section]){
-                    currentSum += value1[i][section];
+                    currentSum += value[i][section];
                 }
             }
         }else{
             for(int i = 0; i < gridSize; i ++){
                 if(contributor[section][i]){
-                    currentSum += value1[section][i];
+                    currentSum += value[section][i];
                 }
             }
         }
         return currentSum;
     }
 
-    private int currentConfirmedSum(int section, boolean column){
+    protected int currentConfirmedSum(int section, boolean column){
         int confirmedSum = 0;
         for(int i = 0; i < gridSize; i++){
             if(column){ 
                 if(confirmedTrue[i][section]){
-                    confirmedSum += value1[i][section];
+                    confirmedSum += value[i][section];
                 }
             }else{
                 if(confirmedTrue[section][i]){
-                    confirmedSum += value1[section][i];
+                    confirmedSum += value[section][i];
                 }
             }
         }
@@ -85,14 +74,14 @@ public class PuzzleValues{
         
     }
 
-    private void deactivateNumber(int row, int column, String deactivation){
+    protected void deactivateNumber(int row, int column, String deactivation){
         contributor[row][column] = false;
         changeMade = true;
         if(systemOut)System.out.println("Deactivated by " + deactivation + " at " + row + "," + column);
         checkSectionSolve(row, column);
     }
 
-    private void confirmNumber(int row, int column, String confirmation){
+    protected void confirmNumber(int row, int column, String confirmation){
         confirmedTrue[row][column] = true;
         changeMade = true;
         if(systemOut)System.out.println("confirmed by " + confirmation + " at " + row + "," + column);
@@ -100,7 +89,7 @@ public class PuzzleValues{
         
     }
 
-    private int getTopDifference(int section, boolean column){
+    protected int getTopDifference(int section, boolean column){
         if(column){
             return (currentSum(section, column) - columns[section]);
         }else{
@@ -108,7 +97,7 @@ public class PuzzleValues{
         }
     }
 
-    private int getLowerDifference(int section, boolean column){
+    protected int getLowerDifference(int section, boolean column){
         if(column){
             return columns[section] - currentConfirmedSum(section, column);
         }else{
@@ -116,7 +105,7 @@ public class PuzzleValues{
         }
     }
 
-    private void checkSectionSolve(int r, int c){
+    protected void checkSectionSolve(int r, int c){
         if(!columnFinished[c]){
             if(currentConfirmedSum(c, true) == columns[c]){
                 columnFinished[c] = true;
@@ -141,7 +130,7 @@ public class PuzzleValues{
         }
     }
 
-    private void deleteUnconfirmedValues(int section, boolean column){
+    protected void deleteUnconfirmedValues(int section, boolean column){
         if(column){
             for(int r = 0; r < gridSize; r++){
                 if(!confirmedTrue[r][section] && contributor[r][section]){
@@ -157,7 +146,7 @@ public class PuzzleValues{
         }
     }
 
-    private void confirmRemainingValues(int section, boolean column){
+    protected void confirmRemainingValues(int section, boolean column){
         if(column){
             for(int r = 0; r < gridSize; r++){
                 if(!confirmedTrue[r][section] && contributor[r][section]){
@@ -177,7 +166,7 @@ public class PuzzleValues{
         
         for(int r = 0; r < gridSize; r++){  //cycle through every value
             for(int c = 0; c < gridSize; c++){
-                if(value1[r][c] > rows[r] || value1[r][c] > columns[c]){ //if given value is greater than column/ row sum
+                if(value[r][c] > rows[r] || value[r][c] > columns[c]){ //if given value is greater than column/ row sum
                     deactivateNumber(r, c, "deleteGreaterValues ");
                 }
             }
@@ -190,8 +179,9 @@ public class PuzzleValues{
             if(!columnFinished[c]){                             //if column isn't finished 
                 currentDiff = getTopDifference(c, true);        //set currentDiff as diff b/w current sum and target
                 for(int r = 0; r < gridSize; r++){              //cycle through every value by column
-                    if(value1[r][c] > currentDiff && contributor[r][c] && !confirmedTrue[r][c]){
+                    if(value[r][c] > currentDiff && contributor[r][c] && !confirmedTrue[r][c]){
                         confirmNumber(r, c, "confirmGreaterThanTDiff(column) ");
+                        System.out.println(currentDiff);
                     }
                 }
             }
@@ -200,7 +190,7 @@ public class PuzzleValues{
             currentDiff = getTopDifference(r, false);
             if(!rowFinished[r]){
                 for(int c = 0; c < gridSize; c++){
-                    if(value1[r][c] > currentDiff && contributor[r][c] && !confirmedTrue[r][c]){
+                    if(value[r][c] > currentDiff && contributor[r][c] && !confirmedTrue[r][c]){
                         confirmNumber(r, c, "confirmGreaterThanTDiff(row) ");
                     }
                 }
@@ -210,12 +200,12 @@ public class PuzzleValues{
         
     }
 
-    private void deleteGTLowerDiff(){
+    protected void deleteGTLowerDiff(){
         int currentDiff;
         for(int c = 0; c < gridSize; c++){
             currentDiff = getLowerDifference(c, true);
             for(int r = 0; r < gridSize; r++){
-                if(value1[r][c] > currentDiff && !confirmedTrue[r][c] && contributor[r][c]){
+                if(value[r][c] > currentDiff && !confirmedTrue[r][c] && contributor[r][c]){
                     deactivateNumber(r, c, "deleteGTLowerDiff(column) ");
                 }
             }
@@ -223,7 +213,7 @@ public class PuzzleValues{
         for(int r = 0; r < gridSize; r++){
             currentDiff = getLowerDifference(r, false);
             for(int c = 0; c < gridSize; c++){
-                if(value1[r][c] > currentDiff && !confirmedTrue[r][c] && contributor[r][c]){
+                if(value[r][c] > currentDiff && !confirmedTrue[r][c] && contributor[r][c]){
                     deactivateNumber(r, c, "deleteGTLowerDiff(row) ");
                 }
             }
@@ -231,7 +221,7 @@ public class PuzzleValues{
         valuePlusLowest();
     }
 
-    private void valuePlusLowest(){
+    protected void valuePlusLowest(){
         for(int c = 0; c < gridSize; c++){
             if(!columnFinished[c]){
                 int topDiff = getTopDifference(c, true);
@@ -240,23 +230,23 @@ public class PuzzleValues{
                 int secondLowestValue = 9;
                 int lowestValueLocation = 0;
                 for(int x = 0; x < gridSize; x++){  //cycle to set variables
-                    if(contributor[x][c] && !confirmedTrue[x][c] && value1[x][c] < lowestUnconfirmedValue){
-                        lowestUnconfirmedValue = value1[x][c];
+                    if(contributor[x][c] && !confirmedTrue[x][c] && value[x][c] < lowestUnconfirmedValue){
+                        lowestUnconfirmedValue = value[x][c];
                         lowestValueLocation = x;
                     }
                 }for(int y = 0; y < gridSize; y++){
-                    if(contributor[y][c] && !confirmedTrue[y][c] && value1[y][c] < secondLowestValue && value1[y][c] != lowestUnconfirmedValue){
-                        secondLowestValue = value1[y][c];
+                    if(contributor[y][c] && !confirmedTrue[y][c] && value[y][c] < secondLowestValue && value[y][c] != lowestUnconfirmedValue){
+                        secondLowestValue = value[y][c];
                     }
                 }for(int r = 0; r < gridSize; r++){  //cycle to delete impossible values
                     if(contributor[r][c] && !confirmedTrue[r][c]){
-                        if(value1[r][c] != topDiff && r != lowestValueLocation && value1[r][c] + lowestUnconfirmedValue > topDiff){
+                        if(value[r][c] != topDiff && r != lowestValueLocation && value[r][c] + lowestUnconfirmedValue > topDiff){
                             confirmNumber(r, c, "valuePlusLowest(column1) ");
-                        }else if(value1[r][c] != topDiff && r == lowestValueLocation && value1[r][c] + secondLowestValue > topDiff){
+                        }else if(value[r][c] != topDiff && r == lowestValueLocation && value[r][c] + secondLowestValue > topDiff){
                             confirmNumber(r, c, "valuePlusLowest(column2) ");
-                        }else if(value1[r][c] != lowerDiff && r != lowestValueLocation && value1[r][c] + lowestUnconfirmedValue > lowerDiff){
+                        }else if(value[r][c] != lowerDiff && r != lowestValueLocation && value[r][c] + lowestUnconfirmedValue > lowerDiff){
                             deactivateNumber(r, c, "valuePlusLowest(column3) ");
-                        }else if(value1[r][c] != lowerDiff && r == lowestValueLocation && value1[r][c] + secondLowestValue > lowerDiff){
+                        }else if(value[r][c] != lowerDiff && r == lowestValueLocation && value[r][c] + secondLowestValue > lowerDiff){
                             deactivateNumber(r, c, "valuePlusLowest(column4) ");
                         }
                     }
@@ -271,23 +261,23 @@ public class PuzzleValues{
                 int secondLowestValue = 10;
                 int lowestValueLocation = 0;
                 for(int x = 0; x < gridSize; x++){  //cycle to set variables
-                    if(contributor[r][x] && !confirmedTrue[r][x] && value1[r][x] < lowestUnconfirmedValue){
-                        lowestUnconfirmedValue = value1[r][x];
+                    if(contributor[r][x] && !confirmedTrue[r][x] && value[r][x] < lowestUnconfirmedValue){
+                        lowestUnconfirmedValue = value[r][x];
                         lowestValueLocation = x;
                     }
                 }for(int y = 0; y < gridSize; y++){
-                    if(contributor[r][y] && !confirmedTrue[r][y] && value1[r][y] < secondLowestValue && value1[r][y] != lowestUnconfirmedValue){
-                        secondLowestValue = value1[r][y];
+                    if(contributor[r][y] && !confirmedTrue[r][y] && value[r][y] < secondLowestValue && value[r][y] != lowestUnconfirmedValue){
+                        secondLowestValue = value[r][y];
                     }
                 }for(int c = 0; c < gridSize; c++){  //cycle to delete impossible values
                     if(contributor[r][c] && !confirmedTrue[r][c]){
-                        if(value1[r][c] != topDiff && c != lowestValueLocation && value1[r][c] + lowestUnconfirmedValue > topDiff){
+                        if(value[r][c] != topDiff && c != lowestValueLocation && value[r][c] + lowestUnconfirmedValue > topDiff){
                             confirmNumber(r, c, "valuePlusLowest(row1) ");
-                        }else if(value1[r][c] != topDiff && c == lowestValueLocation && value1[r][c] + secondLowestValue > topDiff){
+                        }else if(value[r][c] != topDiff && c == lowestValueLocation && value[r][c] + secondLowestValue > topDiff){
                             confirmNumber(r, c, "valuePlusLowest(row2) ");
-                        }else if(value1[r][c] != lowerDiff && c != lowestValueLocation && value1[r][c] + lowestUnconfirmedValue > lowerDiff){
+                        }else if(value[r][c] != lowerDiff && c != lowestValueLocation && value[r][c] + lowestUnconfirmedValue > lowerDiff){
                             deactivateNumber(r, c, "valuePlusLowest(row3) ");
-                        }else if(value1[r][c] != lowerDiff && c == lowestValueLocation && value1[r][c] + secondLowestValue > lowerDiff){
+                        }else if(value[r][c] != lowerDiff && c == lowestValueLocation && value[r][c] + secondLowestValue > lowerDiff){
                             deactivateNumber(r, c, "valuePlusLowest(row4) ");
                         }
                     }
