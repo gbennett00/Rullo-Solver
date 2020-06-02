@@ -1,17 +1,11 @@
 {
     "configurations": [
+        
         {
             "type": "java",
             "name": "CodeLens (Launch) - RulloSolver",
             "request": "launch",
             "mainClass": "rullosolver.RulloSolver",
-            "projectName": "RulloSolver"
-        },
-        {
-            "type": "java",
-            "name": "CodeLens (Launch) - App",
-            "request": "launch",
-            "mainClass": "rullosolver.App",
             "projectName": "RulloSolver"
         }
     ]

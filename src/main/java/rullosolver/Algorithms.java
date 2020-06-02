@@ -1,19 +1,26 @@
 package rullosolver;
 
 
-public class PuzzleValues{
+public class Algorithms{
     
     protected static final int[][] value = ImageReader.getMainValues();
+    /*protected static final int[][] value = {
+        {7, 2, 4, 1, 1},
+        {4, 7, 6, 6, 7},
+        {4, 7, 5, 1, 5},
+        {3, 4, 5, 6, 2},
+        {3, 8, 6, 9, 9}
+    };*/
 
-    protected static final int gridSize = 6;
+    protected static final int gridSize = 5;
 
-    protected static final int[] columns = ImageReader.getColumnValues();
+    protected static final int[] columns = ImageReader.getColumnValues(); //{18, 24, 17, 1, 16}; 
     private static boolean[] columnFinished = new boolean[gridSize];
-    protected static final int[] rows = ImageReader.getRowValues();
+    protected static final int[] rows = ImageReader.getRowValues(); //{9, 17, 17, 10, 23};
     private static boolean[] rowFinished = new boolean[gridSize];
     protected static boolean puzzleFinished = false;
     protected static boolean changeMade = false;
-    protected static boolean systemOut = false;
+    protected static boolean systemOut = true;
     
     private static boolean[][] contributor = new boolean[gridSize][gridSize];
     
