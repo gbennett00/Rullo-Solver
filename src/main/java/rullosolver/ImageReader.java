@@ -1,12 +1,16 @@
 package rullosolver;
 
 import java.io.File;
+import java.util.Scanner;
+
+import static java.lang.System.out;
 
 import net.sourceforge.tess4j.ITesseract;
 import net.sourceforge.tess4j.Tesseract;
 import net.sourceforge.tess4j.TesseractException;
 
 import static rullosolver.Algorithms.gridSize;
+import static rullosolver.RulloSolver.systemOut;
 
 public class ImageReader {
     protected static int[][] value = new int[gridSize][gridSize];
@@ -14,27 +18,38 @@ public class ImageReader {
     protected static int[] columns = new int[gridSize];
     protected static int[] rows = new int[gridSize];
     
-    protected static String baseImage = readImage("Rullo.png");
-    private static String[] imageOutput = baseImage.split("[^0-9]");
-    
-    protected static String readImage(String fileName){
+    protected static String baseImage;
+    private static String[] imageOutput;
+        
+    protected static void readImage(String fileName){
         File imageFile = new File("C:/Users/benne/Downloads/" + fileName);
         ITesseract tesseract = new Tesseract();
         tesseract.setDatapath("C:/Users/benne/Desktop/tesseract/tessdata");
         try {
             String result = tesseract.doOCR(imageFile);
-            System.out.println("systemOut: " + Algorithms.systemOut);
-            if(Algorithms.systemOut){
-                System.out.println(result);
-            } 
-            return result;
+            out.println("systemOut: " + systemOut);
+            baseImage = result;
         }   catch(TesseractException e){
             System.err.println(e.getMessage());
-            return "";
         }
-
+        confirmImageOutput();
     }
 
+    private static void confirmImageOutput() {
+        Scanner s=new Scanner(System.in);
+        out.println(baseImage);
+        out.print("OCR output correct? 'y' or 'n'");
+        String initInput = s.next().trim();
+        s.close();
+        if(initInput.equals("y")){
+            imageOutput = baseImage.split("[^0-9]");
+        }else{
+            out.println("Please copy input and set as imageOutput with needed correction, compile, then run again");
+            System.exit(0);
+        }
+        
+        
+    }
     /*
        0  1  2  3  4
     5  6  7  8  9  10 
@@ -51,23 +66,20 @@ public class ImageReader {
     34 35 36 37 38 39 40 
     41 42 43 44 45 46 47
     */
-
-
-    protected static int[][] getMainValues(){
+    protected static int[][] getMainValues() {
         try {
             
-            
-            for(int i = gridSize + 1; i <= gridSize * (gridSize + 1); i += (gridSize + 1)){
-                int row = i / (gridSize + 1) - 1;
-                for(int h = 0; h < 5; h++){
-                    value[row][h] = Integer.parseInt(imageOutput[i + h]);
+            for(int r = 0; r < gridSize; r++){
+                int firstIndex = (gridSize +1) * (r +1);
+                for(int c = 0; c < gridSize; c++){
+                    value[r][c] = Integer.parseInt(imageOutput[firstIndex + c]);
                 }
+
             }
-            
             return value;
-        }   catch(Exception e){
+        }  catch(Exception e){
             System.err.println(e.getMessage());
-            System.out.println("Tesseract gave invalid values");
+            out.println("Tesseract gave invalid values");
             System.exit(1);
             return value;
         }
@@ -81,7 +93,7 @@ public class ImageReader {
             }
             return columns;
         }   catch(Exception e){
-            System.out.println("Invalid column input");
+            out.println("Invalid column input");
             System.exit(1);
             return columns;
         }
@@ -95,12 +107,10 @@ public class ImageReader {
             }
             return rows;
         }   catch(Exception e){
-            System.out.println("Invalid column input");
+            out.println("Invalid column input");
             System.exit(1);
             return rows;
         }
-    }
-
-    
+    } 
 
 }

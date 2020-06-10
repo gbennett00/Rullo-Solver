@@ -7,12 +7,18 @@ import static java.lang.System.out;
 
 public class RulloSolver{
     public static Algorithms algorithms = new Algorithms();
+    protected static boolean systemOut = false;
     
     public static void main(String args[ ]){
+        if(ImageReader.baseImage == null){
+            ImageReader.readImage("Rullo.png");   
+        }
+        Algorithms.setPuzzleValues();
+        Algorithms.setContributorTrue();
         solvePuzzle();
     }
 
-    private static void outputValues(){
+    private static void outputValues() {
         for(int c = 0; c < gridSize; c++){
             for(int r = 0; r < gridSize; r++){
                 out.println("At point " + r + "," + c + ": " + Algorithms.confirmedTrue[r][c]);
@@ -37,7 +43,7 @@ public class RulloSolver{
                 return;
             }
             cycle++;
-            if(Algorithms.systemOut)System.out.println("Cycle " + cycle + " finished");
+            if(systemOut)System.out.println("Cycle " + cycle + " finished");
         }
         outputValues(); 
     }

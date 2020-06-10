@@ -1,9 +1,10 @@
 package rullosolver;
 
+import static rullosolver.RulloSolver.systemOut;
 
 public class Algorithms{
     
-    protected static final int[][] value = ImageReader.getMainValues();
+    protected static int[][] value; // = ImageReader.getMainValues();
     /*protected static final int[][] value = {
         {7, 2, 4, 1, 1},
         {4, 7, 6, 6, 7},
@@ -12,17 +13,16 @@ public class Algorithms{
         {3, 8, 6, 9, 9}
     };*/
 
-    protected static final int gridSize = 5;
+    protected static final int gridSize = 6;
 
-    protected static final int[] columns = ImageReader.getColumnValues(); //{18, 24, 17, 1, 16}; 
+    protected static int[] columns; // = ImageReader.getColumnValues(); //{18, 24, 17, 1, 16}; 
     private static boolean[] columnFinished = new boolean[gridSize];
-    protected static final int[] rows = ImageReader.getRowValues(); //{9, 17, 17, 10, 23};
+    protected static int[] rows; // = ImageReader.getRowValues(); //{9, 17, 17, 10, 23};
     private static boolean[] rowFinished = new boolean[gridSize];
     protected static boolean puzzleFinished = false;
     protected static boolean changeMade = false;
-    protected static boolean systemOut = true;
     
-    private static boolean[][] contributor = new boolean[gridSize][gridSize];
+    protected static boolean[][] contributor = new boolean[gridSize][gridSize];
     
     protected static void setContributorTrue(){
         for(int x = 0; x < gridSize; x++){
@@ -32,10 +32,16 @@ public class Algorithms{
         }
     }
     
+	public static void setPuzzleValues() {
+        value = ImageReader.getMainValues();
+        columns = ImageReader.getColumnValues();
+        rows = ImageReader.getRowValues();
+    }
+    
     protected static boolean[][] confirmedTrue = new boolean[gridSize][gridSize];
     
     protected void checkForSolve(){
-        for(int x = 0; x < 5; x++){
+        for(int x = 0; x < gridSize; x++){
             checkSectionSolve(x, x);
         }
         for(int x = 0; x < gridSize; x++){
@@ -116,23 +122,24 @@ public class Algorithms{
         if(!columnFinished[c]){
             if(currentConfirmedSum(c, true) == columns[c]){
                 columnFinished[c] = true;
-                deleteUnconfirmedValues(c, true);
                 if(systemOut)System.out.println("column " + c + " finished");
+                deleteUnconfirmedValues(c, true);
             }else if(currentSum(c, true) == columns[c]){
                 columnFinished[c] = true;
-                confirmRemainingValues(c, true);
                 if(systemOut)System.out.println("column " + c + " finished");
+                confirmRemainingValues(c, true);
             }
         } 
         if(!rowFinished[r]){
             if(currentConfirmedSum(r, false) == rows[r] && !rowFinished[r]){
                 rowFinished[r] = true;
-                deleteUnconfirmedValues(r, false);
                 if(systemOut)System.out.println("row " + r + " finished");
+                deleteUnconfirmedValues(r, false);
+                
             }else if(currentSum(r, false) == rows[r]){
                 rowFinished[r] = true;
-                confirmRemainingValues(r, false);
                 if(systemOut)System.out.println("row " + r + " finished");
+                confirmRemainingValues(r, false);
             }
         }
     }
@@ -163,7 +170,7 @@ public class Algorithms{
         }else{
             for(int c = 0; c < gridSize; c++){
                 if(!confirmedTrue[section][c] && contributor[section][c]){
-                    confirmNumber(section, c, "confirm rmainders(row) ");
+                    confirmNumber(section, c, "confirm remainders(row) ");
                 }
             }
         }
@@ -188,7 +195,6 @@ public class Algorithms{
                 for(int r = 0; r < gridSize; r++){              //cycle through every value by column
                     if(value[r][c] > currentDiff && contributor[r][c] && !confirmedTrue[r][c]){
                         confirmNumber(r, c, "confirmGreaterThanTDiff(column) ");
-                        System.out.println(currentDiff);
                     }
                 }
             }
@@ -242,7 +248,7 @@ public class Algorithms{
                         lowestValueLocation = x;
                     }
                 }for(int y = 0; y < gridSize; y++){
-                    if(contributor[y][c] && !confirmedTrue[y][c] && value[y][c] < secondLowestValue && value[y][c] != lowestUnconfirmedValue){
+                    if(contributor[y][c] && !confirmedTrue[y][c] && value[y][c] < secondLowestValue && y != lowestValueLocation){
                         secondLowestValue = value[y][c];
                     }
                 }for(int r = 0; r < gridSize; r++){  //cycle to delete impossible values
@@ -273,7 +279,7 @@ public class Algorithms{
                         lowestValueLocation = x;
                     }
                 }for(int y = 0; y < gridSize; y++){
-                    if(contributor[r][y] && !confirmedTrue[r][y] && value[r][y] < secondLowestValue && value[r][y] != lowestUnconfirmedValue){
+                    if(contributor[r][y] && !confirmedTrue[r][y] && value[r][y] < secondLowestValue && y != lowestValueLocation){
                         secondLowestValue = value[r][y];
                     }
                 }for(int c = 0; c < gridSize; c++){  //cycle to delete impossible values
@@ -292,4 +298,5 @@ public class Algorithms{
             } 
         }
     }
+
 }
