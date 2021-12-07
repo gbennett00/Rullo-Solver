@@ -2,8 +2,14 @@ package rullosolver;
 
 import static rullosolver.RulloSolver.systemOut;
 
+/**
+ * Contains all logical alrogithms used to solve the Rullo puzzle. 
+ * 
+ * @author Garrett Bennett
+ * @version 1.0.1
+ */
 public class Algorithms{
-    
+    // integer values in each location
     protected static int[][] value; // = ImageReader.getMainValues();
     /*protected static final int[][] value = {
         {7, 2, 4, 1, 1},
@@ -13,6 +19,7 @@ public class Algorithms{
         {3, 8, 6, 9, 9}
     };*/
 
+    // eventually will be adjusted by user input
     protected static final int gridSize = 6;
 
     protected static int[] columns; // = ImageReader.getColumnValues(); //{18, 24, 17, 1, 16}; 
@@ -23,7 +30,10 @@ public class Algorithms{
     protected static boolean changeMade = false;
     
     protected static boolean[][] contributor = new boolean[gridSize][gridSize];
+
+    protected static boolean[][] confirmedTrue = new boolean[gridSize][gridSize];
     
+    /** Sets all contributors to true. */
     protected static void setContributorTrue(){
         for(int x = 0; x < gridSize; x++){
             for(int y = 0; y < gridSize; y++){
@@ -32,14 +42,14 @@ public class Algorithms{
         }
     }
     
+    /** Sets all puzzle values to values read in from ImageReader. */
 	public static void setPuzzleValues() {
         value = ImageReader.getMainValues();
         columns = ImageReader.getColumnValues();
         rows = ImageReader.getRowValues();
     }
     
-    protected static boolean[][] confirmedTrue = new boolean[gridSize][gridSize];
-    
+    /** Sets puzzleFinished to true only if all rows/columns are finished. */
     protected void checkForSolve(){
         for(int x = 0; x < gridSize; x++){
             checkSectionSolve(x, x);
@@ -52,6 +62,7 @@ public class Algorithms{
         puzzleFinished = true;
     }
 
+    /** Returns the current sum for a specific row or column. */
     protected int currentSum(int section, boolean column){
         int currentSum = 0;
         if(column){
@@ -70,6 +81,7 @@ public class Algorithms{
         return currentSum;
     }
 
+    /** Returns the sum of confirmed values in a row or column. */
     protected int currentConfirmedSum(int section, boolean column){
         int confirmedSum = 0;
         for(int i = 0; i < gridSize; i++){
@@ -87,6 +99,7 @@ public class Algorithms{
         
     }
 
+    /** Deactivites a number then checks if that change completed a row or column. */
     protected void deactivateNumber(int row, int column, String deactivation){
         contributor[row][column] = false;
         changeMade = true;
@@ -94,6 +107,7 @@ public class Algorithms{
         checkSectionSolve(row, column);
     }
 
+    /** Confirms that a grid value must be activated to solve the puzzle. */
     protected void confirmNumber(int row, int column, String confirmation){
         confirmedTrue[row][column] = true;
         changeMade = true;
@@ -102,6 +116,7 @@ public class Algorithms{
         
     }
 
+    /** Returns the difference between the current sum and target value. */
     protected int getTopDifference(int section, boolean column){
         if(column){
             return (currentSum(section, column) - columns[section]);
@@ -110,6 +125,7 @@ public class Algorithms{
         }
     }
 
+    /** Returns the difference between the current confirmed sum and target value. */
     protected int getLowerDifference(int section, boolean column){
         if(column){
             return columns[section] - currentConfirmedSum(section, column);
@@ -118,6 +134,7 @@ public class Algorithms{
         }
     }
 
+    /** Checks if a row and column are solved.  */
     protected void checkSectionSolve(int r, int c){
         if(!columnFinished[c]){
             if(currentConfirmedSum(c, true) == columns[c]){
@@ -144,6 +161,7 @@ public class Algorithms{
         }
     }
 
+    /** Deactivates all unconfirmed values in a row or column. */
     protected void deleteUnconfirmedValues(int section, boolean column){
         if(column){
             for(int r = 0; r < gridSize; r++){
@@ -160,6 +178,7 @@ public class Algorithms{
         }
     }
 
+    /** Confirms all remaining values. */
     protected void confirmRemainingValues(int section, boolean column){
         if(column){
             for(int r = 0; r < gridSize; r++){
@@ -176,6 +195,7 @@ public class Algorithms{
         }
     }
 
+    /** Deletes all values greater than the target sum. */
     protected void deleteGreaterValues(){
         
         for(int r = 0; r < gridSize; r++){  //cycle through every value
@@ -187,12 +207,13 @@ public class Algorithms{
         }
     }
 
+    /** Confirms values greater than the 'top' difference (see getTopDifference()) */
     protected void confirmGreaterThanTDiff(){
         int currentDiff;
-        for(int c = 0; c < gridSize; c++){                      //cycle through every column
-            if(!columnFinished[c]){                             //if column isn't finished 
-                currentDiff = getTopDifference(c, true);        //set currentDiff as diff b/w current sum and target
-                for(int r = 0; r < gridSize; r++){              //cycle through every value by column
+        for(int c = 0; c < gridSize; c++){                      
+            if(!columnFinished[c]){                             
+                currentDiff = getTopDifference(c, true);       
+                for(int r = 0; r < gridSize; r++){              
                     if(value[r][c] > currentDiff && contributor[r][c] && !confirmedTrue[r][c]){
                         confirmNumber(r, c, "confirmGreaterThanTDiff(column) ");
                     }
@@ -213,6 +234,7 @@ public class Algorithms{
         
     }
 
+    /** Deactivates all values greater than the lower difference (see getLowerDifference()) */
     protected void deleteGTLowerDiff(){
         int currentDiff;
         for(int c = 0; c < gridSize; c++){
@@ -234,6 +256,10 @@ public class Algorithms{
         valuePlusLowest();
     }
 
+    /** 
+     * Deactivates value if value does not equal difference between low sum and target 
+     * AND the value plus the lowest value in section is greater than low sum minus target. 
+     */
     protected void valuePlusLowest(){
         for(int c = 0; c < gridSize; c++){
             if(!columnFinished[c]){

@@ -12,6 +12,13 @@ import net.sourceforge.tess4j.TesseractException;
 import static rullosolver.Algorithms.gridSize;
 import static rullosolver.RulloSolver.systemOut;
 
+/**
+ * Reads an image containing a Rullo puzzle by implementing the Tesseract OCR. 
+ * Then creates an array representation of the puzzle which can be pulled using getter methods.
+ * 
+ * @author Garrett Bennett
+ * @verison 1.0.1
+ */
 public class ImageReader {
     protected static int[][] value = new int[gridSize][gridSize];
 
@@ -21,10 +28,14 @@ public class ImageReader {
     protected static String baseImage;
     private static String[] imageOutput;
         
-    protected static void readImage(String fileName){
+    /** Reads an image contianing a Rullo puzzle.
+     * 
+     * @param fileName File name of the image with the Rullo puzzle
+     */
+    protected static void readImage(String fileName){ 
         File imageFile = new File("C:/Users/benne/Downloads/" + fileName);
         ITesseract tesseract = new Tesseract();
-        tesseract.setDatapath("C:/Users/benne/Desktop/tesseract/tessdata");
+        tesseract.setDatapath("C:/Users/benne/Downloads/tesseract-5.0.0/tesseract-5.0.0/tessdata");
         try {
             String result = tesseract.doOCR(imageFile);
             out.println("systemOut: " + systemOut);
@@ -35,6 +46,7 @@ public class ImageReader {
         confirmImageOutput();
     }
 
+    /** Gives the user an opportunity to correct any mistakes the OCR made in reading the puzzle values. */
     private static void confirmImageOutput() {
         Scanner s=new Scanner(System.in);
         out.println(baseImage);
@@ -66,6 +78,7 @@ public class ImageReader {
     34 35 36 37 38 39 40 
     41 42 43 44 45 46 47
     */
+    /** Returns a double int array containing the main values of a puzzle.  */
     protected static int[][] getMainValues() {
         try {
             
@@ -86,19 +99,22 @@ public class ImageReader {
         
     }
 
+    /** Returns all target column values. */
     protected static int[] getColumnValues(){
         try {
             for(int i = 0; i < gridSize; i++){
                 columns[i] =  Integer.parseInt(imageOutput[i]);
             }
             return columns;
-        }   catch(Exception e){
+        }   
+        catch(Exception e){
             out.println("Invalid column input");
             System.exit(1);
             return columns;
         }
     }
 
+    /** Returns all target row values. */
     protected static int[] getRowValues(){
         try{
             for(int i = 0; i < gridSize; i++){
@@ -106,7 +122,8 @@ public class ImageReader {
                 rows[i] = Integer.parseInt(imageOutput[index]);
             }
             return rows;
-        }   catch(Exception e){
+        }   
+        catch(Exception e){
             out.println("Invalid column input");
             System.exit(1);
             return rows;
