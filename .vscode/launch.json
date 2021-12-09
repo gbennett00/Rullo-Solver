@@ -1,6 +1,12 @@
 {
     "configurations": [
-        
+        {
+            "type": "java",
+            "name": "Launch RecursiveSolve",
+            "request": "launch",
+            "mainClass": "rullosolver.RecursiveSolve",
+            "projectName": "RulloSolver"
+        },
         {
             "type": "java",
             "name": "CodeLens (Launch) - RulloSolver",
