@@ -16,11 +16,12 @@ public class RulloSolver{
      * @param args Command line argument - not used
      */
     public static void main(String args[ ]){
-        if(ImageReader.baseImage == null){
+        /*if(ImageReader.baseImage == null){
             ImageReader.readImage("RulloOutput.png");   
-        }
-        /*Algorithms a = new Algorithms();
-        a.solvePuzzle();*/
+        }*/
+        AlgorithmSolve a = new AlgorithmSolve();
+        a.solvePuzzle();
+        
 
     }
 
