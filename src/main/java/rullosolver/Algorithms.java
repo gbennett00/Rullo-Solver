@@ -8,45 +8,32 @@ import static rullosolver.RulloSolver.systemOut;
  * @author Garrett Bennett
  * @version 1.0.1
  */
-public class Algorithms{
-    // integer values in each location
-    protected static int[][] value; // = ImageReader.getMainValues();
-    /*protected static final int[][] value = {
-        {7, 2, 4, 1, 1},
-        {4, 7, 6, 6, 7},
-        {4, 7, 5, 1, 5},
-        {3, 4, 5, 6, 2},
-        {3, 8, 6, 9, 9}
-    };*/
+public class Algorithms extends RulloPuzzle{
+     
+      
 
-    // eventually will be adjusted by user input
-    protected static final int gridSize = 6;
-
-    protected static int[] columns; // = ImageReader.getColumnValues(); //{18, 24, 17, 1, 16}; 
-    private static boolean[] columnFinished = new boolean[gridSize];
-    protected static int[] rows; // = ImageReader.getRowValues(); //{9, 17, 17, 10, 23};
-    private static boolean[] rowFinished = new boolean[gridSize];
-    protected static boolean puzzleFinished = false;
-    protected static boolean changeMade = false;
-    
-    protected static boolean[][] contributor = new boolean[gridSize][gridSize];
-
-    protected static boolean[][] confirmedTrue = new boolean[gridSize][gridSize];
-    
-    /** Sets all contributors to true. */
-    protected static void setContributorTrue(){
-        for(int x = 0; x < gridSize; x++){
-            for(int y = 0; y < gridSize; y++){
-                contributor[x][y] = true;
+    /**
+     * Cycles through all algorithms until the puzzle is complete 
+     * or one complete cycle was made without any changes.
+     */
+    protected void solvePuzzle(){
+        int cycle = 0;
+        setContributorTrue();
+        this.deleteGreaterValues();
+        while(!puzzleFinished){ 
+            changeMade = false;
+            this.confirmGreaterThanTDiff();
+            this.checkForSolve();
+            if(!changeMade && !puzzleFinished){
+                puzzleFinished = true;
+                System.out.println("Forgive me father, for I have failed");
+                outputValues(contributor);
+                return;
             }
+            cycle++;
+            if(systemOut)System.out.println("Cycle " + cycle + " finished");
         }
-    }
-    
-    /** Sets all puzzle values to values read in from ImageReader. */
-	public static void setPuzzleValues() {
-        value = ImageReader.getMainValues();
-        columns = ImageReader.getColumnValues();
-        rows = ImageReader.getRowValues();
+        outputValues(contributor); 
     }
     
     /** Sets puzzleFinished to true only if all rows/columns are finished. */

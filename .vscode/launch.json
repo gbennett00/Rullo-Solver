@@ -2,6 +2,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "Launch PreparedImage",
+            "request": "launch",
+            "mainClass": "rullosolver.PreparedImage",
+            "projectName": "RulloSolver"
+        },
+        {
+            "type": "java",
             "name": "Launch RecursiveSolve",
             "request": "launch",
             "mainClass": "rullosolver.RecursiveSolve",

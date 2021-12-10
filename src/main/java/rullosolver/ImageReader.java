@@ -1,6 +1,8 @@
 package rullosolver;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 import static java.lang.System.out;
@@ -35,15 +37,23 @@ public class ImageReader {
     protected static void readImage(String fileName){ 
         File imageFile = new File("C:/Users/benne/Downloads/" + fileName);
         ITesseract tesseract = new Tesseract();
+        List<String> configs = new ArrayList<String>();
+        configs.add("digits");
+        tesseract.setConfigs(configs);
         tesseract.setDatapath("C:/Users/benne/Downloads/tesseract-5.0.0/tesseract-5.0.0/tessdata");
         try {
             String result = tesseract.doOCR(imageFile);
             out.println("systemOut: " + systemOut);
             baseImage = result;
+            System.out.println(result);
         }   catch(TesseractException e){
             System.err.println(e.getMessage());
         }
         confirmImageOutput();
+    }
+
+    protected static void prepareImage(String fileName) {
+        
     }
 
     /** Gives the user an opportunity to correct any mistakes the OCR made in reading the puzzle values. */
@@ -51,7 +61,7 @@ public class ImageReader {
         Scanner s=new Scanner(System.in);
         out.println(baseImage);
         out.print("OCR output correct? 'y' or 'n'");
-        String initInput = s.next().trim();
+        String initInput = s.next().strip();
         s.close();
         if(initInput.equals("y")){
             imageOutput = baseImage.split("[^0-9]");
@@ -91,8 +101,8 @@ public class ImageReader {
             }
             return value;
         }  catch(Exception e){
-            System.err.println(e.getMessage());
-            out.println("Tesseract gave invalid values");
+            e.printStackTrace();
+            out.println("Tesseract gave invalid values. Screw you.");
             System.exit(1);
             return value;
         }
