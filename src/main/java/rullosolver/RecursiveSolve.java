@@ -2,7 +2,6 @@ package rullosolver;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 /**
  *  Contains methods to solve a Rullo puzzle recursively.
@@ -11,7 +10,8 @@ import java.util.List;
  * @version 1.0.2
  */
 public class RecursiveSolve extends RulloPuzzle {
-    
+    private int[][] solvedPuzzle;
+
     /**
      * Returns an ArrayList<int[]> of all posible combinations whose sum equals the target t. 
      * @param i Starting index
@@ -57,6 +57,7 @@ public class RecursiveSolve extends RulloPuzzle {
         }
 
         for (int k = 0; k < possibilities.get(solIndex).size(); k++) {
+            
             solution[solIndex] = possibilities.get(solIndex).get(k);
             solve(solIndex+1, solution, finalSolution, possibilities);
         }
@@ -89,27 +90,16 @@ public class RecursiveSolve extends RulloPuzzle {
     public static void main(String[] args) {
         RecursiveSolve rs = new RecursiveSolve();
         //int[][] solvedPuzzle = new int[gridSize][gridSize];
-        ArrayList<int[][]> solvedPuzzle = rs.solve(0, new int[gridSize][gridSize], new ArrayList<int[][]>(), rs.getPossibleSolutions());
-        rs.outputValues(solvedPuzzle.get(0));
+        rs.solvedPuzzle = rs.solve(0, new int[gridSize][gridSize], new ArrayList<int[][]>(), rs.getPossibleSolutions()).get(0);
+        rs.outputValues();
     }
 
-    protected void outputValues(int[][] solution) {
+    protected void outputValues() {
         for(int c = 0; c < gridSize; c++){
             for(int r = 0; r < gridSize; r++){
-                System.out.print(solution[c][r] + " ");
+                System.out.print(solvedPuzzle[c][r] + " ");
             }
             System.out.println();
         }
     }
-
-
-    private static void print_list(ArrayList<int[]> sol) {
-        for (int[] ints : sol) {
-            for (int i : ints) {
-                System.out.print(i + " ");
-            }System.out.println();
-        }
-    }
-
-
 }

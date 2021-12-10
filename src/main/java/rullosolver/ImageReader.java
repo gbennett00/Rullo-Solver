@@ -11,7 +11,7 @@ import net.sourceforge.tess4j.ITesseract;
 import net.sourceforge.tess4j.Tesseract;
 import net.sourceforge.tess4j.TesseractException;
 
-import static rullosolver.Algorithms.gridSize;
+import static rullosolver.AlgorithmSolve.gridSize;
 import static rullosolver.RulloSolver.systemOut;
 
 /**

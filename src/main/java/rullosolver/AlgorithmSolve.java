@@ -8,9 +8,17 @@ import static rullosolver.RulloSolver.systemOut;
  * @author Garrett Bennett
  * @version 1.0.1
  */
-public class Algorithms extends RulloPuzzle{
+public class AlgorithmSolve extends RulloPuzzle{
      
-      
+    protected boolean[] columnFinished = new boolean[gridSize];
+    protected boolean[] rowFinished = new boolean[gridSize];
+
+    protected boolean puzzleFinished = false;
+    protected boolean changeMade = false;
+    
+    protected boolean[][] contributor = new boolean[gridSize][gridSize];
+
+    protected boolean[][] confirmedTrue = new boolean[gridSize][gridSize];
 
     /**
      * Cycles through all algorithms until the puzzle is complete 
@@ -27,15 +35,40 @@ public class Algorithms extends RulloPuzzle{
             if(!changeMade && !puzzleFinished){
                 puzzleFinished = true;
                 System.out.println("Forgive me father, for I have failed");
-                outputValues(contributor);
+                outputValues();
                 return;
             }
             cycle++;
             if(systemOut)System.out.println("Cycle " + cycle + " finished");
         }
-        outputValues(contributor); 
+        outputValues(); 
     }
     
+    /** Sets all contributors to true. */
+    private void setContributorTrue(){
+        for(int x = 0; x < gridSize; x++){
+            for(int y = 0; y < gridSize; y++){
+                contributor[x][y] = true;
+            }
+        }
+    }
+
+    /**
+     * Prints the indices of each value and whether it should be "on" 
+     * or "off" for the puzzle to be solved.
+     */
+    protected void outputValues() {
+        for(int c = 0; c < gridSize; c++){
+            for(int r = 0; r < gridSize; r++){
+                if (contributor[c][r]) {
+                    System.out.print(value[c][r] + " ");
+                } else{
+                    System.out.print(0 + " ");
+                }
+            } System.out.println();
+        }
+    }
+
     /** Sets puzzleFinished to true only if all rows/columns are finished. */
     protected void checkForSolve(){
         for(int x = 0; x < gridSize; x++){
