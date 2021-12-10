@@ -43,22 +43,42 @@ public class RecursiveSolve extends RulloPuzzle {
         return solutions;
     }
 
-    protected ArrayList<int[]> solve() {
+    // have a parameter finalSolution that this method saves the valid solution to
+    protected ArrayList<int[][]> solve(int solIndex, int[][] solution, ArrayList<int[][]> finalSolution, ArrayList<ArrayList<int[]>> possibilities) {
+        if (solIndex == gridSize) {
+            if (checkSolve(solution)) {
+                int[][] solutionCopy = new int[gridSize][gridSize];
+                for (int i = 0; i < gridSize; i++) {
+                    solutionCopy[i] = Arrays.copyOf(solution[i], gridSize);
+                }
+                finalSolution.add(solutionCopy);
+            }
+            return finalSolution;
+        }
+
+        for (int k = 0; k < possibilities.get(solIndex).size(); k++) {
+            solution[solIndex] = possibilities.get(solIndex).get(k);
+            solve(solIndex+1, solution, finalSolution, possibilities);
+        }
+        return finalSolution;
+    }
+
+    private ArrayList<ArrayList<int[]>> getPossibleSolutions() {
         ArrayList<ArrayList<int[]>> possibleSolutions = new ArrayList<ArrayList<int[]>>();
         for (int i = 0; i < rows.length; i++) {
             ArrayList<int[]> section = solveSection(0, rows[i], 0, new int[rows.length], value[i], new ArrayList<int[]>());
             possibleSolutions.add(section);
         }
-        return possibleSolutions.get(0);
+        return possibleSolutions;
     }
 
-    private boolean checkSolve(int[][] potentialSolution) {
-        for (int r = 0; r < rows.length; r++) {
+    protected boolean checkSolve(int[][] potentialSolution) {
+        for (int c = 0; c < rows.length; c++) {
             int sum = 0;
-            for (int c = 0; c < rows.length; c++) {
+            for (int r = 0; r < rows.length; r++) {
                 sum += potentialSolution[r][c];
             }
-            if (sum != columns[r]) {
+            if (sum != columns[c]) {
                 return false;
             }
         }
@@ -68,7 +88,18 @@ public class RecursiveSolve extends RulloPuzzle {
 
     public static void main(String[] args) {
         RecursiveSolve rs = new RecursiveSolve();
-        rs.solve();
+        //int[][] solvedPuzzle = new int[gridSize][gridSize];
+        ArrayList<int[][]> solvedPuzzle = rs.solve(0, new int[gridSize][gridSize], new ArrayList<int[][]>(), rs.getPossibleSolutions());
+        rs.outputValues(solvedPuzzle.get(0));
+    }
+
+    protected void outputValues(int[][] solution) {
+        for(int c = 0; c < gridSize; c++){
+            for(int r = 0; r < gridSize; r++){
+                System.out.print(solution[c][r] + " ");
+            }
+            System.out.println();
+        }
     }
 
 
