@@ -7,7 +7,7 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * Prepares images to be passed read using OCR. Essentially strips everything 
+ * Prepares images to be read using OCR. Essentially strips everything 
  * from a Rullo puzzle photo other than the white numbers.
  */
 public class PreparedImage {
