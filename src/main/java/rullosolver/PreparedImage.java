@@ -6,24 +6,34 @@ import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.IOException;
 
-
+/**
+ * Prepares images to be passed read using OCR. Essentially strips everything 
+ * from a Rullo puzzle photo other than the white numbers.
+ */
 public class PreparedImage {
-    BufferedImage image = null;
-    File file = null;
+    private BufferedImage image = null;
+    private File file = null;
+    private String filePath;
 
-
-    public static void main(String[] args) {
-        PreparedImage pi = new PreparedImage();
+    /** Creates a prepared image with a specified file path. */
+    protected PreparedImage(String filePathIn) {
+        filePath = filePathIn;
         try {
-            pi.prepareImage();
-            System.out.println("Conversion successful.");
+            prepareImage();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    protected void prepareImage() throws IOException {
-        file = new File("C:/Users/benne/Downloads/Rullo.png");
+
+    /** Returns the prepared image. */
+    protected BufferedImage getPreparedImage() {
+        return image;
+    }
+
+    /** Prepares an image by stripping all colors and retaining the white numbers. */
+    private void prepareImage() throws IOException {
+        file = new File(filePath);
         image = ImageIO.read(file);
         int width = image.getWidth();
         int height = image.getHeight();
@@ -40,15 +50,17 @@ public class PreparedImage {
                     p = (a<<24) | (0<<16) | (0<<8) | 0;
                     image.setRGB(x, y, p);;
                 }
-                //calculate average
-
-                //p = (a<<24) | (avg<<16) | (avg<<8) | avg;
-                //replace RGB value with avg
-
-                //image.setRGB(x, y, p);
             }
         }
-        file = new File("C:/Users/benne/Downloads/RulloOutput.png");
+    }
+
+    /** Saves the prepared image to a file in the specified directory. */
+    protected void saveFile(String directory) throws IOException {
+        if (directory == null) {
+            file = new File("C:/Users/benne/Downloads/RulloOutput.png");
+        } else {
+            file = new File(directory);
+        }
         ImageIO.write(image, "png", file);
     }
 }
