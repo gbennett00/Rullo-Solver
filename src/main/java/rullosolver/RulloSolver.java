@@ -5,28 +5,25 @@ package rullosolver;
  * out the cycling of the program and output the solution. 
  * 
  * @author Garrett Bennett
- * @version 1.0.1
+ * @version 1.0.2
  */
 public class RulloSolver{
-    protected static boolean systemOut = false;
-    
     /**
      * Reads the image containing the Rullo puzzle then solves the puzzle.
      * 
      * @param args Command line argument - not used
      */
-    public static void main(String args[ ]){
-        /*if(ImageReader.baseImage == null){
-            ImageReader.readImage("RulloOutput.png");   
-        }*/
-        AlgorithmSolve a = new AlgorithmSolve();
-        a.solvePuzzle();
+    public static void main(String args[]){
+        // prepares and reads an image then prepares data to be used
+        ImageReader ir = new ImageReader("Rullo.png");
         
-
+        // instantiate RecursiveSolve 
+            // pass values, rows, and columns into constructor
+            // call solvePuzzle() and outputValues() to print solution
+        RecursiveSolve rs = new RecursiveSolve(ir.getGridSize(), ir.getMainValues(), ir.getColumnValues(), ir.getRowValues());
+        rs.solvePuzzle();
+        System.out.println("Solution: ");
+        rs.outputValues();
     }
-
-    
-
-    
 }
 

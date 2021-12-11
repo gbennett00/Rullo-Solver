@@ -1,18 +1,12 @@
 package rullosolver;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-import static java.lang.System.out;
-
 import net.sourceforge.tess4j.ITesseract;
 import net.sourceforge.tess4j.Tesseract;
 import net.sourceforge.tess4j.TesseractException;
-
-import static rullosolver.AlgorithmSolve.gridSize;
-import static rullosolver.RulloSolver.systemOut;
 
 /**
  * Reads an image containing a Rullo puzzle by implementing the Tesseract OCR. 
@@ -22,76 +16,77 @@ import static rullosolver.RulloSolver.systemOut;
  * @verison 1.0.1
  */
 public class ImageReader {
-    protected static int[][] value = new int[gridSize][gridSize];
-
-    protected static int[] columns = new int[gridSize];
-    protected static int[] rows = new int[gridSize];
-    
-    protected static String baseImage;
-    private static String[] imageOutput;
+    private String[] imageOutput;
+    private int gridSize;
         
-    /** Reads an image contianing a Rullo puzzle.
+    /**
+     * Reads an image using the Tesseract OCR and prepares data to be used.
+     * 
+     * @param filename Name of file containing the Rullo image
+     */
+    protected ImageReader(String filename) {
+        readImage(filename);
+        gridSize = (int) (Math.sqrt(imageOutput.length + 1) - 1);
+    }
+
+    /** 
+     * Reads an image contianing a Rullo puzzle. Calls confirmImageOutput in succession.
      * 
      * @param fileName File name of the image with the Rullo puzzle
      */
-    protected static void readImage(String fileName){ 
-        File imageFile = new File("C:/Users/benne/Downloads/" + fileName);
+    protected void readImage(String fileName){ 
         ITesseract tesseract = new Tesseract();
         List<String> configs = new ArrayList<String>();
         configs.add("digits");
         tesseract.setConfigs(configs);
         tesseract.setDatapath("C:/Users/benne/Downloads/tesseract-5.0.0/tesseract-5.0.0/tessdata");
         try {
-            String result = tesseract.doOCR(imageFile);
-            out.println("systemOut: " + systemOut);
-            baseImage = result;
-            System.out.println(result);
+            PreparedImage prep = new PreparedImage("C:/Users/benne/Downloads/" + fileName);
+            String baseImage = tesseract.doOCR(prep.getPreparedImage());
+            String[] imageRows = baseImage.split("\n");
+            confirmImageOutput(imageRows);
         }   catch(TesseractException e){
             System.err.println(e.getMessage());
         }
-        confirmImageOutput();
     }
 
-    protected static void prepareImage(String fileName) {
-        
-    }
-
-    /** Gives the user an opportunity to correct any mistakes the OCR made in reading the puzzle values. */
-    private static void confirmImageOutput() {
-        Scanner s=new Scanner(System.in);
-        out.println(baseImage);
-        out.print("OCR output correct? 'y' or 'n'");
-        String initInput = s.next().strip();
-        s.close();
-        if(initInput.equals("y")){
-            imageOutput = baseImage.split("[^0-9]");
-        }else{
-            out.println("Please copy input and set as imageOutput with needed correction, compile, then run again");
-            System.exit(0);
-        }
-        
-        
-    }
-    /*
-       0  1  2  3  4
-    5  6  7  8  9  10 
-    11 12 13 14 15 16 
-    17 18 19 20 21 22 
-    23 24 25 26 27 28 
-    29 30 31 32 33 34
-
-       0  1  2  3  4  5
-    6  7  8  9  10 11 12 
-    13 14 15 16 17 18 19 
-    20 21 22 23 24 25 26 
-    27 28 29 30 31 32 33 
-    34 35 36 37 38 39 40 
-    41 42 43 44 45 46 47
+    /** 
+     * Gives the user an opportunity to correct any mistakes the OCR made in reading the puzzle values.
+     * 
+     * @param initValues Array containing String objects for each row
     */
+    private void confirmImageOutput(String[] initValues) {
+        Scanner s=new Scanner(System.in);
+        outputValues(initValues);
+        System.out.print("OCR output correct? 'y' or 'n' ");
+        String initInput = s.next().strip();
+        while(!initInput.equals("y")) {
+            System.out.print("Enter row number: ");
+            int row = s.nextInt();
+            s.nextLine();
+            System.out.print("Enter new row values: ");
+            Scanner s1 = new Scanner(s.nextLine());
+            String nextLine = "";
+            while(s1.hasNext()) {
+                nextLine += s1.next() + " ";
+            }
+            initValues[row] = nextLine.strip();
+            outputValues(initValues);
+            System.out.print("Is output correct now? 'y' or 'n' ");
+            initInput = s.next().strip();
+        }
+        initInput = "";
+        for (int r = 0; r < initValues.length; r++) {
+            initInput += initValues[r] + " ";
+        }
+        imageOutput = initInput.split("[^0-9]");
+        s.close();
+    }
+    
     /** Returns a double int array containing the main values of a puzzle.  */
-    protected static int[][] getMainValues() {
+    protected int[][] getMainValues() {
         try {
-            
+            int[][] value = new int[gridSize][gridSize];
             for(int r = 0; r < gridSize; r++){
                 int firstIndex = (gridSize +1) * (r +1);
                 for(int c = 0; c < gridSize; c++){
@@ -102,31 +97,34 @@ public class ImageReader {
             return value;
         }  catch(Exception e){
             e.printStackTrace();
-            out.println("Tesseract gave invalid values. Screw you.");
+            System.out.println("Tesseract gave invalid values.");
             System.exit(1);
-            return value;
+            return null;
         }
         
     }
 
     /** Returns all target column values. */
-    protected static int[] getColumnValues(){
+    protected int[] getColumnValues(){
         try {
+            int[] columns = new int[gridSize];
             for(int i = 0; i < gridSize; i++){
                 columns[i] =  Integer.parseInt(imageOutput[i]);
             }
             return columns;
         }   
         catch(Exception e){
-            out.println("Invalid column input");
+            System.out.println("Invalid column input");
+            e.printStackTrace();
             System.exit(1);
-            return columns;
+            return null;
         }
     }
 
     /** Returns all target row values. */
-    protected static int[] getRowValues(){
+    protected int[] getRowValues(){
         try{
+            int[] rows = new int[gridSize];
             for(int i = 0; i < gridSize; i++){
                 int index = i == 0 ? gridSize : (i + 1) * (gridSize + 1) - 1; 
                 rows[i] = Integer.parseInt(imageOutput[index]);
@@ -134,10 +132,32 @@ public class ImageReader {
             return rows;
         }   
         catch(Exception e){
-            out.println("Invalid column input");
+            System.out.println("Invalid column input");
+            e.printStackTrace();
             System.exit(1);
-            return rows;
+            return null;
         }
     } 
 
+    /** Returns gridSize for this image. */
+    protected int getGridSize() {
+        return gridSize;
+    }
+
+    /** Prints all main values. */
+    protected void outputValues(String[][] values) {
+        for(int c = 0; c < values.length; c++){
+            for(int r = 0; r < values[c].length; r++){
+                System.out.print(values[c][r] + " ");
+            }
+            System.out.println();
+        }
+    }
+
+    /** Prints target sum values. */
+    protected void outputValues(String[] section) {
+        for(int i = 0; i < section.length; i++) {
+            System.out.println(section[i] + " ");
+        }
+    }
 }
