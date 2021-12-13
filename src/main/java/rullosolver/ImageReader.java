@@ -13,7 +13,7 @@ import net.sourceforge.tess4j.TesseractException;
  * Then creates an array representation of the puzzle which can be pulled using getter methods.
  * 
  * @author Garrett Bennett
- * @verison 1.0.1
+ * @verison 1.0.2
  */
 public class ImageReader {
     private String[] imageOutput;
