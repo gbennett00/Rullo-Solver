@@ -1,5 +1,11 @@
 package rullosolver;
 
+/**
+ * Object representing a Rullo Puzzle.
+ * 
+ * @author Garrett Bennett
+ * @version 1.0.2
+ */
 public abstract class RulloPuzzle {
     // all fields are base cases; can be overwritten in constructors of child classes
     protected int[][] value = {
