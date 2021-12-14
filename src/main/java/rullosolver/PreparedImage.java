@@ -54,7 +54,7 @@ public class PreparedImage {
                     image.setRGB(x, y, p);;
                 }
             }
-        }
+        }        
     }
 
     /** Saves the prepared image to a file in the specified directory. */

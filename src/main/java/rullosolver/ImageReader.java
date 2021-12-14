@@ -18,15 +18,28 @@ import net.sourceforge.tess4j.TesseractException;
 public class ImageReader {
     private String[] imageOutput;
     private int gridSize;
+    private ITesseract tesseract = new Tesseract();
+    private PreparedImage prep;
+    private int unitHeight;
+    private int unitWidth;
+    
         
     /**
      * Reads an image using the Tesseract OCR and prepares data to be used.
      * 
      * @param filename Name of file containing the Rullo image
      */
-    protected ImageReader(String filename) {
-        readImage(filename);
-        gridSize = (int) (Math.sqrt(imageOutput.length + 1) - 1);
+    protected ImageReader(String filename, int gridSiezIn) {
+        gridSize = gridSiezIn;
+        List<String> configs = new ArrayList<String>();
+        configs.add("digits");
+        tesseract.setConfigs(configs);
+        tesseract.setVariable("psm", "0");
+        tesseract.setVariable("preserve_interword_space", "1");
+        tesseract.setDatapath("C:/Users/benne/Downloads/tesseract-5.0.0/tesseract-5.0.0/tessdata");
+        prep = new PreparedImage("C:/Users/benne/Downloads/" + filename);
+        unitHeight = prep.getPreparedImage().getHeight() / (gridSize + 1);
+        unitWidth = prep.getPreparedImage().getWidth() / (gridSize + 1);
     }
 
     /** 
@@ -36,10 +49,6 @@ public class ImageReader {
      */
     protected void readImage(String fileName){ 
         ITesseract tesseract = new Tesseract();
-        List<String> configs = new ArrayList<String>();
-        configs.add("digits");
-        tesseract.setConfigs(configs);
-        tesseract.setDatapath("C:/Users/benne/Downloads/tesseract-5.0.0/tesseract-5.0.0/tessdata");
         try {
             PreparedImage prep = new PreparedImage("C:/Users/benne/Downloads/" + fileName);
             String baseImage = tesseract.doOCR(prep.getPreparedImage());
@@ -47,7 +56,7 @@ public class ImageReader {
             confirmImageOutput(imageRows);
         }   catch(TesseractException e){
             System.err.println(e.getMessage());
-        }
+        }   
     }
 
     /** 
