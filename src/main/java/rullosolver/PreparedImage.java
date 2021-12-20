@@ -1,6 +1,7 @@
 package rullosolver;
 
 import java.awt.image.BufferedImage;
+
 import javax.imageio.ImageIO;
 
 import java.io.File;
@@ -9,6 +10,9 @@ import java.io.IOException;
 /**
  * Prepares images to be read using OCR. Essentially strips everything 
  * from a Rullo puzzle photo other than the white numbers.
+ * 
+ * @author Garrett Bennett
+ * @version 1.0.3
  */
 public class PreparedImage {
     private BufferedImage image = null;
@@ -24,7 +28,6 @@ public class PreparedImage {
             e.printStackTrace();
         }
     }
-
 
     /** Returns the prepared image. */
     protected BufferedImage getPreparedImage() {
@@ -51,7 +54,7 @@ public class PreparedImage {
                     image.setRGB(x, y, p);;
                 }
             }
-        }
+        }        
     }
 
     /** Saves the prepared image to a file in the specified directory. */
