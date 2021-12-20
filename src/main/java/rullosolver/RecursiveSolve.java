@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
- *  Contains methods to solve a Rullo puzzle recursively.
+ *  Contains values of a Rullo puzzle and methods to solve the puzzle recursively.
  * 
  * @author Garrett Bennett
  * @version 1.0.2
@@ -12,10 +12,17 @@ import java.util.Arrays;
 public class RecursiveSolve extends RulloPuzzle {
     private int[][] solvedPuzzle;
 
-    protected RecursiveSolve() {
-        
-    }
+    /** Creates RecursiveSolve object with default values. */
+    protected RecursiveSolve() {}
 
+    /** 
+     * Creates RecursiveSolve object with user-defined values.
+     * 
+     * @param gridSiezIn Grid size
+     * @param mainValues Main values
+     * @param columnsIn Column values
+     * @param rowsIn Row values
+     */
     protected RecursiveSolve(int gridSiezIn, int[][] mainValues, int[] columnsIn, int[] rowsIn) {
         value = mainValues;
         columns = columnsIn;
@@ -23,8 +30,13 @@ public class RecursiveSolve extends RulloPuzzle {
         gridSize = gridSiezIn;
     }
 
+    /** Returns the solved puzzle. */
     protected int[][] solvePuzzle() {
-        solvedPuzzle = solve(0, new int[gridSize][gridSize], new ArrayList<int[][]>(), getPossibleSolutions()).get(0);
+        try{
+            solvedPuzzle = solve(0, new int[gridSize][gridSize], new ArrayList<int[][]>(), getPossibleSolutions()).get(0);
+        } catch (Exception e) {
+            System.out.println("No solution found.");
+        }
         return solvedPuzzle;
     }
 
@@ -35,6 +47,7 @@ public class RecursiveSolve extends RulloPuzzle {
      * @param sol Solution array
      * @param vals Unchanged array of input values
      * @param solutions Target for solution arrays
+     * @return ArrayList<int[]> representing all possible combinations of the given section
      */
     private ArrayList<int[]> solveSection(int i, int t, int sum, int[] sol, int[] vals, ArrayList<int[]> solutions) {
         if (sum == t) {
@@ -59,6 +72,14 @@ public class RecursiveSolve extends RulloPuzzle {
         return solutions;
     }
 
+    /**
+     * Recursively solves the puzzle using all possible combinations of each row. 
+     * @param solIndex
+     * @param solution
+     * @param finalSolution
+     * @param possibilities
+     * @return ArrayList<int[][]> representing the solution 
+     */
     private ArrayList<int[][]> solve(int solIndex, int[][] solution, ArrayList<int[][]> finalSolution, ArrayList<ArrayList<int[]>> possibilities) {
         if (solIndex == gridSize) {
             if (checkSolve(solution)) {
@@ -79,6 +100,7 @@ public class RecursiveSolve extends RulloPuzzle {
         return finalSolution;
     }
 
+    /** Returns an object representing all possible solutions for each row.  */
     private ArrayList<ArrayList<int[]>> getPossibleSolutions() {
         ArrayList<ArrayList<int[]>> possibleSolutions = new ArrayList<ArrayList<int[]>>();
         for (int i = 0; i < rows.length; i++) {
@@ -88,6 +110,7 @@ public class RecursiveSolve extends RulloPuzzle {
         return possibleSolutions;
     }
 
+    /** Returns true if the current values are a valid solution. */
     private boolean checkSolve(int[][] potentialSolution) {
         for (int c = 0; c < rows.length; c++) {
             int sum = 0;
@@ -101,6 +124,7 @@ public class RecursiveSolve extends RulloPuzzle {
         return true;
     }
 
+    /** Outputs the finished puzzle. */
     protected void outputValues() {
         for(int c = 0; c < gridSize; c++){
             for(int r = 0; r < gridSize; r++){
